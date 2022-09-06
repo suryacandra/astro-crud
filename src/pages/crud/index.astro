@@ -1,0 +1,32 @@
+---
+
+import Crud from "../../components/Crud";
+import Header from "../../components/Header.astro";
+import { getUser, redirectUser } from "@astro-auth/core";
+
+
+const user = getUser({client: Astro})
+if (!user) {
+  return redirectUser("/");
+}
+
+if(user.role !== "admin") {
+  return redirectUser("/");
+}
+
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>CRUD</title>
+	</head>
+	<body>
+		<Header>
+			<div class="m-5">
+				<Crud client:load />
+			</div>
+		</Header>
+	</body>
+</html>

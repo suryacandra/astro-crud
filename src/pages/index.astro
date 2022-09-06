@@ -1,0 +1,54 @@
+---
+import Main from "../components/Main";
+import Login from "../components/Login";
+import Header from "../components/Header.astro";
+import { connectDb } from "../../lib/connectDb";
+import { getUser } from "@astro-auth/core";
+import { getError } from "@astro-auth/core";
+
+const error = getError(Astro);
+const user = getUser({ client: Astro });
+const client = user && await connectDb();
+const db = client?.db("astro");
+const collection = db?.collection("data");
+const data = await collection?.find({}).sort({ $natural: -1 }).toArray();
+client?.close()
+console.log(data)
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Astro</title>
+  </head>
+  <body>
+    <Header>
+      <div
+        class="flex flex-col items-center gap-5 p-5 m-5 border-2 border-black"
+      >
+        {!user && <Login client:load />}
+        {user && <Main user={user} client:load />}
+        {
+          !user && (
+            <button class="bg-green-300 px-5 p-2">
+              <a href="/register">Register</a>
+            </button>
+          )
+        }
+        <span>
+          {user && user.name}
+          <div class="flex flex-col gap-2 items-center">
+            {
+              user &&
+                data.map((item) => (
+                  <div class="border-2 border-black m-2 p-2">{item.title}</div>
+                ))
+            }
+          </div>
+          {error && error}
+        </span>
+      </div>
+    </Header>
+  </body>
+</html>

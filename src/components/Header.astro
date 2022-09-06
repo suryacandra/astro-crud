@@ -1,0 +1,26 @@
+---
+import { getUser, redirectUser } from "@astro-auth/core";
+
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.slice(1)
+
+
+const user = getUser({client: Astro})
+const admin = user?.role === "admin"
+
+---
+
+    <div>
+        <div class="bg-red-300 p-2 flex justify-between gap-2">
+            <h1>Header</h1>
+            <ul class="flex gap-2 items-center">
+              {admin &&  <li class={currentPath === 'crud' ? 'bg-yellow-300' : ''}>
+                    <a href="/crud">Crud</a>
+                </li>}
+                <li class={currentPath === '' ? 'bg-yellow-300' : ''}>
+                    <a href="/">Home</a>
+                </li>
+            </ul>
+        </div>
+        <slot />
+    </div>
